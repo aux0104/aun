@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ノ・アルフレ LP コンプライアンスレビュー</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --surface2: #f0efe9;
+    --border: #e2e0d8;
+    --border2: #ccc9bc;
+    --text: #1a1916;
+    --text2: #6b6860;
+    --text3: #9e9c94;
+    --r5-bg: #fce8e8; --r5-text: #7a1f1f; --r5-accent: #d94040;
+    --r4-bg: #fdf0d8; --r4-text: #6b3d00; --r4-accent: #d97e10;
+    --r3-bg: #e8f0fc; --r3-text: #1a3a6b; --r3-accent: #3a6fd8;
+    --rna-bg: #ededea; --rna-text: #555; --rna-accent: #888;
+    --green: #2a7a4b; --green-bg: #e6f5ed;
+    --del-bg: #fce8e8; --del-text: #7a1f1f;
+    --blue-bg: #e8f0fc; --blue-text: #1a3a6b; --blue-border: #3a6fd8;
+    --radius: 8px; --radius-lg: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04);
+  }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--text);
+    color: #fff;
+    padding: 20px 32px;
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  header h1 { font-size: 17px; font-weight: 700; letter-spacing: .02em; }
+  header .meta { font-size: 12px; color: #aaa; font-family: 'DM Mono', monospace; }
+
+  /* ── Main layout ── */
+  .container { max-width: 1100px; margin: 0 auto; padding: 24px 24px 60px; }
+
+  /* ── Stats bar ── */
+  .stats {
+    display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;
+  }
+  .stat {
+    flex: 1; min-width: 80px;
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+  .stat .num { font-size: 26px; font-weight: 700; line-height: 1; font-family: 'DM Mono', monospace; }
+  .stat .lbl { font-size: 11px; color: var(--text2); margin-top: 4px; }
+  .num-r5 { color: var(--r5-accent); }
+  .num-r4 { color: var(--r4-accent); }
+  .num-r3 { color: var(--r3-accent); }
+  .num-na { color: var(--text3); }
+
+  /* ── Toolbar ── */
+  .toolbar {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .filters { display: flex; gap: 6px; flex-wrap: wrap; }
+  .filter-btn {
+    font-size: 12px; font-family: 'Noto Sans JP', sans-serif;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 0.5px solid var(--border2);
+    background: var(--surface);
+    color: var(--text2);
+    cursor: pointer;
+    transition: all .15s;
+    font-weight: 400;
+  }
+  .filter-btn:hover { background: var(--surface2); color: var(--text); }
+  .filter-btn.active { font-weight: 700; }
+  .filter-btn[data-filter="all"].active { background: var(--text); color: #fff; border-color: var(--text); }
+  .filter-btn[data-filter="5"].active { background: var(--r5-bg); color: var(--r5-text); border-color: var(--r5-accent); }
+  .filter-btn[data-filter="4"].active { background: var(--r4-bg); color: var(--r4-text); border-color: var(--r4-accent); }
+  .filter-btn[data-filter="3"].active { background: var(--r3-bg); color: var(--r3-text); border-color: var(--r3-accent); }
+
+  .search-wrap { margin-left: auto; position: relative; }
+  .search-wrap input {
+    font-size: 13px; font-family: 'Noto Sans JP', sans-serif;
+    padding: 7px 14px 7px 34px;
+    border-radius: var(--radius);
+    border: 0.5px solid var(--border2);
+    background: var(--surface);
+    color: var(--text);
+    width: 200px;
+    outline: none;
+    transition: border-color .15s;
+  }
+  .search-wrap input:focus { border-color: var(--r3-accent); }
+  .search-wrap::before {
+    content: '🔍';
+    position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+    font-size: 13px; pointer-events: none;
+  }
+
+  /* ── Table ── */
+  .table-wrap {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  col.c-no { width: 52px; }
+  col.c-risk { width: 62px; }
+  col.c-after { width: 200px; }
+  col.c-comment { width: auto; }
+  col.c-status { width: 88px; }
+
+  th {
+    background: var(--surface2);
+    font-size: 11px; font-weight: 700;
+    color: var(--text3);
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 0.5px solid var(--border);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+  th:first-child { text-align: center; }
+
+  td {
+    padding: 11px 14px;
+    border-bottom: 0.5px solid var(--border);
+    vertical-align: top;
+    font-size: 13px;
+    word-break: break-all;
+  }
+  tr:last-child td { border-bottom: none; }
+  tbody tr { cursor: pointer; transition: background .1s; }
+  tbody tr:hover td { background: #faf9f5; }
+
+  .td-no { text-align: center; font-family: 'DM Mono', monospace; font-weight: 500; font-size: 13px; color: var(--text2); }
+  .td-risk { text-align: center; }
+
+  .badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px; border-radius: 50%;
+    font-size: 13px; font-weight: 700; font-family: 'DM Mono', monospace;
+  }
+  .b5 { background: var(--r5-bg); color: var(--r5-text); }
+  .b4 { background: var(--r4-bg); color: var(--r4-text); }
+  .b3 { background: var(--r3-bg); color: var(--r3-text); }
+  .bna { background: var(--rna-bg); color: var(--rna-text); font-size: 10px; }
+
+  .after-text { color: var(--r3-text); font-size: 12px; line-height: 1.5; }
+  .del-pill {
+    display: inline-block;
+    background: var(--del-bg); color: var(--del-text);
+    font-size: 11px; font-weight: 700; padding: 2px 8px;
+    border-radius: 4px; letter-spacing: .04em;
+  }
+  .na-dash { color: var(--text3); font-size: 12px; }
+  .comment-preview { color: var(--text2); font-size: 12px; line-height: 1.5; }
+
+  .status-select {
+    font-size: 11px; font-family: 'Noto Sans JP', sans-serif;
+    padding: 4px 6px;
+    border-radius: var(--radius);
+    border: 0.5px solid var(--border2);
+    background: var(--surface);
+    color: var(--text);
+    width: 100%;
+    cursor: pointer;
+    outline: none;
+  }
+  tr.done td { opacity: .55; }
+  tr.done .status-select { border-color: var(--green); color: var(--green); }
+
+  .no-results { text-align: center; padding: 40px; color: var(--text3); font-size: 13px; }
+
+  /* ── Modal ── */
+  .modal-bg {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(20,18,14,.45);
+    z-index: 200;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 48px 20px 40px;
+    overflow-y: auto;
+  }
+  .modal-bg.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    border: 0.5px solid var(--border2);
+    max-width: 620px; width: 100%;
+    padding: 24px;
+    position: relative;
+    box-shadow: var(--shadow-md);
+    animation: slideIn .18s ease;
+  }
+  @keyframes slideIn { from { transform: translateY(-12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  .modal-close {
+    position: absolute; top: 18px; right: 18px;
+    background: var(--surface2); border: none;
+    width: 28px; height: 28px; border-radius: 50%;
+    font-size: 16px; cursor: pointer; color: var(--text2);
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s;
+  }
+  .modal-close:hover { background: var(--border); }
+
+  .modal-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 18px; padding-right: 36px;
+  }
+  .modal-header h2 { font-size: 15px; font-weight: 700; }
+
+  .detail-block { margin-bottom: 14px; }
+  .detail-label {
+    font-size: 11px; font-weight: 700; color: var(--text3);
+    letter-spacing: .06em; text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .after-box {
+    background: var(--blue-bg);
+    border-left: 3px solid var(--blue-border);
+    padding: 10px 14px;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: 13px; line-height: 1.7;
+    color: var(--blue-text);
+  }
+  .comment-box {
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    padding: 12px 14px;
+    border-radius: var(--radius);
+    font-size: 13px; line-height: 1.7;
+    color: var(--text2);
+  }
+  .risk-desc {
+    font-size: 12px; color: var(--text2);
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    padding: 6px 10px; border-radius: var(--radius);
+    margin-top: 6px;
+  }
+
+  /* ── Progress bar ── */
+  .progress-wrap { margin-bottom: 20px; }
+  .progress-header { display: flex; justify-content: space-between; font-size: 12px; color: var(--text2); margin-bottom: 6px; }
+  .progress-track {
+    height: 6px; background: var(--surface2);
+    border-radius: 3px; overflow: hidden;
+    border: 0.5px solid var(--border);
+  }
+  .progress-bar { height: 100%; background: var(--green); border-radius: 3px; transition: width .4s ease; }
+
+  /* ── Footer ── */
+  footer { text-align: center; font-size: 11px; color: var(--text3); padding: 20px; }
+
+  @media (max-width: 680px) {
+    col.c-after { width: 120px; }
+    col.c-status { width: 72px; }
+    header { padding: 16px 16px; }
+    .container { padding: 16px; }
+    .search-wrap input { width: 140px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>ノ・アルフレ LP — コンプライアンスレビュー</h1>
+  <span class="meta">2026年4月27日 ／ 東京神谷町綜合法律事務所</span>
+</header>
+
+<div class="container">
+
+  <div class="stats" id="stats"></div>
+
+  <div class="progress-wrap" id="progress-wrap">
+    <div class="progress-header">
+      <span>対応進捗</span>
+      <span id="progress-text">0 / 32 完了</span>
+    </div>
+    <div class="progress-track"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+  </div>
+
+  <div class="toolbar">
+    <div class="filters">
+      <button class="filter-btn active" data-filter="all">すべて (32)</button>
+      <button class="filter-btn" data-filter="5">🔴 リスク5</button>
+      <button class="filter-btn" data-filter="4">🟠 リスク4</button>
+      <button class="filter-btn" data-filter="3">🔵 リスク3</button>
+      <button class="filter-btn" data-filter="na">⚪ 要確認</button>
+    </div>
+    <div class="search-wrap">
+      <input type="text" id="search" placeholder="キーワード検索...">
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <colgroup>
+        <col class="c-no"><col class="c-risk"><col class="c-after"><col class="c-comment"><col class="c-status">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>No.</th>
+          <th>Risk</th>
+          <th>修正後テキスト</th>
+          <th>指摘内容（クリックで詳細）</th>
+          <th>対応状況</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<footer>株式会社AUX — 社内使用限定資料</footer>
+
+<!-- Modal -->
+<div class="modal-bg" id="modal-bg">
+  <div class="modal">
+    <button class="modal-close" id="modal-close">✕</button>
+    <div class="modal-header">
+      <span class="badge" id="m-badge"></span>
+      <h2 id="m-title"></h2>
+    </div>
+    <div id="m-body"></div>
+  </div>
+</div>
+
+<script>
+const RISK_DESC = {
+  5: '行政処分等の具体的な法執行を受けた前例が存在するか、極めて類似している',
+  4: '過去に行政処分を受けた前例はないが、法執行を受ける可能性が十分にある',
+  3: '法執行まで受ける可能性は高くないが、行政指導を受ける可能性が十分にある',
+};
+
+const DATA = [
+  {no:1,risk:4,after:'定期継続特典 Amazonギフト券 4回継続で合計2,000円分',comment:'定期購入を3回継続で1,000円、4回継続で1,000円のギフト券のため「必ず全員貰える」は事実と異なる。'},
+  {no:2,risk:4,after:'',comment:'「このページを見た方限定」「今だけ」が事実でなければ有利誤認表示。事実であれば具体的な期間の明示が必要（特商法違反）。'},
+  {no:3,risk:4,after:'洗浄成分天然由来100％',comment:'天然由来100％が洗浄成分のみを指す場合、その点を明示しなければ優良誤認表示になる。'},
+  {no:4,risk:3,after:'',comment:'「世界の美容業界で注目！」が事実でなければ優良誤認表示になる恐れあり。'},
+  {no:5,risk:3,after:'',comment:'注釈でいいので、正式な成分名と配合目的の併記が必要（エイジングケア成分の記載について）。'},
+  {no:6,risk:4,after:'',comment:'雑誌賞について、雑誌側の客観的評価に基づくものでない等、合理的根拠を欠く場合は優良誤認表示になる。'},
+  {no:7,risk:5,after:'削除',comment:'「今月発送分 予約受付中」「売切続出」等、各月の出荷量が限定されすぐ売り切れとの印象を与えるが事実ではないと思われ優良誤認表示。'},
+  {no:8,risk:4,after:'削除',comment:'4回継続しないと2,000円分のギフト券はもらえないため「初回分実質無料キャンペーン」とは言えない。キャンペーンが事実ならば期間の明示が必要（特商法違反）。'},
+  {no:9,risk:4,after:'単品価格6,578円 定期便初回限定価格 1本1,780円 約73％OFF 送料無料\n2回目以降 詰め替え290ml×2袋 10,956円',comment:'2回目以降は商品・容量・数量・金額が異なるのに記載がなく特商法違反・有利誤認表示。また販売実績のない価格を「通常価格」と表示することも有利誤認表示。'},
+  {no:10,risk:4,after:'【解約について】定期便解約のご連絡は、次回発送日の7日前までにお電話（0120-406-201 平日10:00〜17:00）にてご連絡ください。7日前を過ぎますと次々回お届け分からの解約となります。（文字を大きく）',comment:'解約方法が注釈レベルの文字サイズのみ。消費者庁は注釈を存在しないものとして扱うため特商法違反に相当。電話番号・受付時間の記載も必要。また「発送日の7日前」という条件は購入者が発送日を把握できるか確認が必要。'},
+  {no:11,risk:4,after:'20日間返金保証 ご注文日から20日以内にお電話（0120-406-201 平日10:00〜17:00）にてご連絡ください。返金には明細書と商品を送料お客様負担でご返送いただく必要があります。',comment:'オファー表示に近接した箇所に返金保証の主要条件の記載が必要。送料・振込手数料・後払い手数料を購入者負担にすると実質返金額がほぼゼロになり「返金保証」表示自体が有利誤認になる恐れあり。'},
+  {no:12,risk:4,after:'初回価格が4,798円もお得！',comment:'誤字と思われるが、実際の差額（4,798円）と異なる表示（5,890円）のため有利誤認表示。'},
+  {no:13,risk:4,after:'2回目以降もお得な価格でお届け',comment:'2回目以降はボトルから詰め替えパウチに商品が変わり容量も異なるため、価格をそのまま比較することはできない。'},
+  {no:14,risk:3,after:'削除',comment:'香り変更について次回発送日の7日前までという制約があるため「いつでも何度でもOK」は事実と異なり有利誤認の恐れ。'},
+  {no:15,risk:3,after:'メディアや雑誌での紹介も！',comment:'「特集も多数！」の表現について、雑誌側の判断で特集を組んだ事実がなければ優良誤認表示になる恐れあり。'},
+  {no:16,risk:null,after:'',comment:'2020年9月10日〜2021年9月9日の1年間で5分に1本という主張は年間10万5,120本の販売実績に相当。その実績が実際にあるか要確認。'},
+  {no:17,risk:5,after:'削除',comment:'「シャンプー部門No.1 受賞」について、ブランド名イメージ調査であり実際の売上・品質評価ではないため、No.1表示の合理的裏付けがなく優良誤認表示。'},
+  {no:18,risk:3,after:'Rakutenデイリーランキングでも3冠達成！（2019年12月14日）',comment:'6年以上前のデイリーランキング結果をそのまま「3冠達成！」と現在も表示するのは優良誤認表示になる恐れあり。取得日を明示する。'},
+  {no:19,risk:4,after:'',comment:'「驚きの満足度97%」について、算出した調査の内容・調査機関・調査方法の明示が必要。合理的根拠がなければ優良誤認表示になる。'},
+  {no:20,risk:5,after:'PR表示を追記',comment:'体験談の掲載者が企業から依頼を受けて作成されたと思われるため、PR表示がなければステルスマーケティング規制違反になる。'},
+  {no:21,risk:3,after:'さらに悪化するかも',comment:'「みるみる老け髪へ」という表現は加齢による毛髪変化を防ぐアンチエイジング効果を暗示するが、化粧品の効能範囲を逸脱する。'},
+  {no:22,risk:3,after:'',comment:'「美のクリスタルシリカ配合」について注釈で正式な成分名（シリカ）と配合目的を併記する必要あり。'},
+  {no:23,risk:3,after:'シリカでキューティクルを補修',comment:'「シリカでケラチンをサポート」はシリカにケラチン強化作用があるとの印象を与えるが化粧品の効果範囲を逸脱する。'},
+  {no:24,risk:3,after:'',comment:'ダークニル（Darkenyl）について注釈で正式な成分名と配合目的を併記する必要あり。'},
+  {no:25,risk:3,after:'サポート成分',comment:'「黒サポート成分」という表現は毛髪を黒くする効果を暗示する恐れがあるが、化粧品の効能範囲を逸脱する。'},
+  {no:26,risk:4,after:'削除',comment:'「使用前後の比較」との印象を与える画像だが、実際にはスタイリング剤等で違いを作り出しており優良誤認表示になる。'},
+  {no:27,risk:3,after:'',comment:'ゴレンシ葉エキスについて注釈で配合目的を併記する必要あり。'},
+  {no:28,risk:3,after:'削除',comment:'頭皮の「使用前後比較」との印象を与える画像について、実際には商品使用前後の画像ではなく、効果・効能を暗示する薬機法違反の恐れあり。'},
+  {no:29,risk:4,after:'もし肌に合わなくても',comment:'定期購入の広告において「ぜひ一度お試しください」という「試す」表現は有利誤認表示になる。'},
+  {no:30,risk:4,after:'削除',comment:'「安心してお試しください」の「試す」表現も同様に有利誤認表示。定期購入契約であることを明確にする必要あり。'},
+  {no:31,risk:5,after:'削除',comment:'カウントダウンタイマーが0になると注文不可との印象を与えるが事実と異なり有利誤認表示。またチャットボット内に定期購入の説明が一切なく、契約内容を理解しないまま申し込み完了できる状態は特商法違反・有利誤認に相当。'},
+  {no:32,risk:5,after:'',comment:'FVからフローティングバナーが常時表示され、チャットボットが繰り返し立ち上がる。最初のオファー部分に必要事項をすべて記載した後に限定してフローティングバナー・チャットボットを表示するよう改修が必要。'},
+];
+
+const STATUS_OPTIONS = [
+  {val:'pending', label:'未対応'},
+  {val:'wip',     label:'対応中'},
+  {val:'done',    label:'対応済'},
+  {val:'skip',    label:'見送り'},
+];
+
+const statusStore = {};
+DATA.forEach(d => statusStore[d.no] = 'pending');
+
+function badgeClass(r){ return r===5?'b5':r===4?'b4':r===3?'b3':'bna'; }
+function badgeLabel(r){ return r||'?'; }
+
+function updateStats(){
+  const cnt={5:0,4:0,3:0,na:0};
+  DATA.forEach(d=>{ if(d.risk===5)cnt[5]++; else if(d.risk===4)cnt[4]++; else if(d.risk===3)cnt[3]++; else cnt.na++; });
+  document.getElementById('stats').innerHTML=`
+    <div class="stat"><div class="stat .num" style="font-size:26px;font-weight:700;font-family:'DM Mono',monospace;">${DATA.length}</div><div class="lbl">指摘総数</div></div>
+    <div class="stat"><div class="num num-r5">${cnt[5]}</div><div class="lbl">リスク5</div></div>
+    <div class="stat"><div class="num num-r4">${cnt[4]}</div><div class="lbl">リスク4</div></div>
+    <div class="stat"><div class="num num-r3">${cnt[3]}</div><div class="lbl">リスク3</div></div>
+    <div class="stat"><div class="num num-na">${cnt.na}</div><div class="lbl">要確認</div></div>
+  `;
+}
+
+function updateProgress(){
+  const done = Object.values(statusStore).filter(s=>s==='done'||s==='skip').length;
+  const total = DATA.length;
+  const pct = Math.round(done/total*100);
+  document.getElementById('progress-text').textContent = `${done} / ${total} 完了`;
+  document.getElementById('progress-bar').style.width = pct+'%';
+}
+
+function renderTable(filter, query){
+  const tbody = document.getElementById('tbody');
+  const q = query.toLowerCase();
+  let rows = DATA.filter(d=>{
+    if(filter==='5' && d.risk!==5) return false;
+    if(filter==='4' && d.risk!==4) return false;
+    if(filter==='3' && d.risk!==3) return false;
+    if(filter==='na' && d.risk!==null) return false;
+    if(q){
+      return d.comment.toLowerCase().includes(q)
+        || d.after.toLowerCase().includes(q)
+        || String(d.no).includes(q);
+    }
+    return true;
+  });
+
+  if(!rows.length){
+    tbody.innerHTML=`<tr><td colspan="5" class="no-results">該当する指摘事項がありません</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rows.map(d=>{
+    const afterHtml = d.after==='削除'
+      ? `<span class="del-pill">削除</span>`
+      : d.after
+        ? `<span class="after-text">${d.after.replace(/\n/g,'<br>')}</span>`
+        : `<span class="na-dash">—</span>`;
+    const preview = d.comment.length>55 ? d.comment.slice(0,53)+'…' : d.comment;
+    const st = statusStore[d.no];
+    const isDone = st==='done'||st==='skip';
+    const selectHtml = STATUS_OPTIONS.map(o=>`<option value="${o.val}"${st===o.val?' selected':''}>${o.label}</option>`).join('');
+    return `<tr data-no="${d.no}" class="${isDone?'done':''}">
+      <td class="td-no">${d.no}</td>
+      <td class="td-risk"><span class="badge ${badgeClass(d.risk)}">${badgeLabel(d.risk)}</span></td>
+      <td>${afterHtml}</td>
+      <td class="comment-preview">${preview}</td>
+      <td><select class="status-select" data-no="${d.no}" onclick="event.stopPropagation()">${selectHtml}</select></td>
+    </tr>`;
+  }).join('');
+
+  tbody.querySelectorAll('tr[data-no]').forEach(tr=>{
+    tr.addEventListener('click', ()=>openModal(+tr.dataset.no));
+  });
+  tbody.querySelectorAll('.status-select').forEach(sel=>{
+    sel.addEventListener('change', e=>{
+      const no = +e.target.dataset.no;
+      statusStore[no] = e.target.value;
+      const tr = e.target.closest('tr');
+      const isDone = e.target.value==='done'||e.target.value==='skip';
+      tr.classList.toggle('done', isDone);
+      updateProgress();
+    });
+  });
+}
+
+function openModal(no){
+  const d = DATA.find(x=>x.no===no);
+  if(!d) return;
+  const badge = document.getElementById('m-badge');
+  badge.className = 'badge '+badgeClass(d.risk);
+  badge.textContent = badgeLabel(d.risk);
+  document.getElementById('m-title').textContent = `指摘 No.${d.no}`;
+
+  const afterHtml = d.after==='削除'
+    ? `<span class="del-pill" style="font-size:13px;padding:4px 10px">削除</span>`
+    : d.after
+      ? `<div class="after-box">${d.after.replace(/\n/g,'<br>')}</div>`
+      : `<span class="na-dash">修正案なし（内容を要確認）</span>`;
+
+  const riskSection = d.risk
+    ? `<div class="risk-desc">リスク${d.risk}：${RISK_DESC[d.risk]||''}</div>`
+    : `<div class="risk-desc">確認事項：事実確認が必要な項目です。</div>`;
+
+  document.getElementById('m-body').innerHTML = `
+    <div class="detail-block">
+      <div class="detail-label">リスク評価</div>
+      ${riskSection}
+    </div>
+    <div class="detail-block">
+      <div class="detail-label">修正後テキスト</div>
+      ${afterHtml}
+    </div>
+    <div class="detail-block">
+      <div class="detail-label">指摘内容・理由</div>
+      <div class="comment-box">${d.comment}</div>
+    </div>
+  `;
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+document.getElementById('modal-close').addEventListener('click',()=>{
+  document.getElementById('modal-bg').classList.remove('open');
+});
+document.getElementById('modal-bg').addEventListener('click',e=>{
+  if(e.target===document.getElementById('modal-bg'))
+    document.getElementById('modal-bg').classList.remove('open');
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') document.getElementById('modal-bg').classList.remove('open');
+});
+
+let currentFilter='all', currentQuery='';
+document.querySelectorAll('.filter-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    renderTable(currentFilter, currentQuery);
+  });
+});
+document.getElementById('search').addEventListener('input',e=>{
+  currentQuery = e.target.value.trim();
+  renderTable(currentFilter, currentQuery);
+});
+
+updateStats();
+updateProgress();
+renderTable('all','');
+</script>
+</body>
+</html>
